@@ -1,0 +1,100 @@
+4. 注释
+------------
+
+注释虽然写起来很痛苦, 但对保证代码可读性至关重要. 下面的规则描述了如何注释以及在哪儿注释. 当然也要记住: 注释固然很重要, 但最好的代码本身应该是自文档化. 有意义的类型名和变量名, 要远胜过要用注释解释的含糊不清的名字.
+
+你写的注释是给代码读者看的: 下一个需要理解你的代码的人. 慷慨些吧, 下一个人可能就是你!
+
+记住所有在C++ 代码风格规范中指明的规范和约定在此处同样适用, 除此之外还有以下几点.
+
+4.1. 文件注释
+~~~~~~~~~~~~~~~~
+
+.. tip::
+    每一个文件必须以版权声明开始, 其后为该文件的内容描述. 
+
+4.1.2. 法律公告和作者信息
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. tip::
+    在每一个文件开头加入版权公告, 然后是文件内容描述.
+
+每个文件都应该包含以下项, 依次是:
+
+    - 版权声明 (比如, ``Copyright 2008 Google Inc.``)
+        
+    - 许可证. 为项目选择合适的许可证版本 (比如, Apache 2.0, BSD, LGPL, GPL)
+
+如果你对原始作者的文件做了重大修改, 将你的信息添加到作者信息里. 这样当其他人对该文件有疑问时可以知道该联系谁.
+
+4.2. 声明注释
+~~~~~~~~~~~~~~~~
+
+.. tip::
+    每一个interface, category, 和protocol 声明必须伴随一段描述其目以及如何使用的注释.
+
+.. code-block:: c++
+
+        // A delegate for NSApplication to handle notifications about app
+        // launch and shutdown. Owned by the main app controller.
+        @interface MyAppDelegate : NSObject {
+          ...
+        }
+        @end
+
+如果你已经在文件顶部的注释中详细的描述了一个interface, 你可以声明"请查看文件顶部的注释查看详细描述", 但是要确保你有这样的注释.
+
+在interface 中的每一个方法应该有一个注释, 用来解释它的功能、参数、返回值以及任何副作用的. 
+
+如果类有任何同步前提, 必须说明. 如果该类的实例可被多线程访问, 要特别注意说明多线程环境下相关的规则和常量使用
+
+4.2. 实现注释
+~~~~~~~~~~~~~~~~
+
+.. tip::
+    在注释中使用竖条来引用变量名和符号, 而不是内联的引用或者命名此符号.
+
+这样可以减少歧义, 特别是当这个符号是一个普通单词的时候, 注释有可能会被误认为一个结构不好的句子. 比如, 符号``count``:
+
+    .. code-block:: c++
+
+        // Sometimes we need |count| to be less than zero.
+
+或者引用的符号已被包含在引用中时: 
+       
+    .. code-block:: c++
+
+        // Remember to call |StringWithoutSpaces("foo bar baz")|
+
+4.3. 对象所有权
+~~~~~~~~~~~~~~~~
+
+.. tip::
+    当指针和大多数Objective-C 的使用习惯很不同时, 竟可能的确保它的所有权模式为explicit.
+
+对于指向由NSObject 继承对象的实例变量指针, 它默认是会被类所保存的, 如果不被类所保留应该注明为``weak``. 但是被标记为IBOutlets的实例变量默认是不被类所保存的, 但是当该类保留了它们时必须注明为``strong``. 
+
+当实例变量指向CoreFoundation, C++ 和其他非Objective-C 对象时, 应该注明其为强类型 还是弱类型. 注意, 隐藏在Objective-C 对象中的自动C++ 对象默认是被禁用的, 相关说明在`这里 <http://chanson.livejournal.com/154253.html>`_ .
+
+关于强类型 和弱类型 的注释的例子:
+
+    .. code-block:: c++
+
+          @interface MyDelegate : NSObject {
+           @private
+            IBOutlet NSButton* okButton_;  // normal NSControl
+            IBOutlet NSMenu* myContextMenu_;  // manually-loaded menu (strong)
+
+            AnObjcObject* doohickey_;  // my doohickey
+            MyController* controller_;  // so we can send msgs back (weak, owns me)
+
+            // non-NSObject pointers...
+            CWackyCPPClass* wacky_;  // some cross-platform object (strong)
+            CFDictionaryRef* dict_;  // (strong)
+          }
+          @end
+
+强类型 :
+    这种对象被类所保存.
+弱类型 :
+    这种对象不被类所保存.

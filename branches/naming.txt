@@ -1,0 +1,160 @@
+3. 命名约定
+------------
+
+命名规则对于可维护的代码来说非常重要. Objective-C 方法的命名规则会很长, 但是这有一个好处, 代码块读起来就像小结, 也就不需要写很多注释了.
+
+在书写纯Objective-C 代码时, 我们主要遵循`标准Objective-C 命名规则 <http://developer.apple.com/documentation/Cocoa/Conceptual/CodingGuidelines/CodingGuidelines.html>`_. 这意味着命名规范可能会和C++ 风格规范有明显的不同. 比如, Google 的C++ 风格规范建议变量名的单词之间使用下划线, 但是这份规范建议使用大小写分割, 这也是Objective-C 社区的标准.
+
+在书写Objective-C++代码时, 事情就不那么简单了. 许多项目需要使用Objective-C 或者Cocoa 实现跨平台的C++ API, 或者C++ 后端和 Cocoa前端的桥接. 这导致了两个标准直接冲突的情况.
+
+
+我们的解决方案是这样的, 当你的方法/函数的实现部分位于``@implementation`` 块中时, 使用Objective-C 命名规则; 当你为一个C++ 类实现一个方法时, 使用C++ 命名规范. 这避免了在一个函数中实例和局部变量的命名规则混杂的局面, 而这个局面会给可读性带来严重的损害. 
+
+3.1. 文件名
+~~~~~~~~~~~~~~~~~~~~
+
+.. tip::
+    文件名应该反映所实现类的名字 ---- 大小写敏感. 在你的项目中应遵循这个约定.
+
+文件后缀规则: 
+
+=====  ==========================
+          文件后缀   
+---------------------------------
+  后缀          对应类型  
+=====  ==========================
+.h      C/C++/Objective-C 头文件
+.m      Objective-C 实现文件
+.mm     Objective-C++ 实现文件
+.cc     纯C++ 实现文件
+.c      C 实现文件
+=====  ==========================
+
+categories 的文件名应包含被扩展类的名字, 例如``GTMNSString+Utils.h`` 或者``GTMNSTextView+Autocomplete.h``
+
+
+3.2. Objective-C++
+~~~~~~~~~~~~~~~~~~~
+
+.. tip::
+    在实现文件中, Objective-C++ 中的方法/函数实现遵循如下风格.
+
+为了尽量减少在Cocoa/Objective-C 和C++ 混合代码中的命名风格冲突, 在实现时遵循下面的风格. 如果代码位于``@implementation``块中, 使用Objective-C 命名规则. 如果为一个C++ 类实现一个方法, 使用C++ 命名风格.
+
+        .. code-block:: c++
+        // file: cross_platform_header.h
+        
+        class CrossPlatformAPI {
+         public:
+          ...
+          int DoSomethingPlatformSpecific();  // impl on each platform
+         private:
+          int an_instance_var_;
+        };
+        
+        // file: mac_implementation.mm
+        #include "cross_platform_header.h"
+        
+        // A typical Objective-C class, using Objective-C naming.
+        @interface MyDelegate : NSObject {
+         @private
+          int instanceVar_;
+          CrossPlatformAPI* backEndObject_;
+        }
+        - (void)respondToSomething:(id)something;
+        @end
+        @implementation MyDelegate
+        - (void)respondToSomething:(id)something {
+          // bridge from Cocoa through our C++ backend
+          instanceVar_ = backEndObject-&gt;DoSomethingPlatformSpecific();
+          NSString* tempString = [NSString stringWithInt:instanceVar_];
+          NSLog(@"%@", tempString);
+        }
+        @end
+        
+        // The platform-specific implementation of the C++ class, using
+        // C++ naming.
+        int CrossPlatformAPI::DoSomethingPlatformSpecific() {
+          NSString* temp_string = [NSString stringWithInt:an_instance_var_];
+          NSLog(@"%@", temp_string);
+          return [temp_string intValue];
+        }
+
+3.3. 类名
+~~~~~~~~~
+
+.. tip::
+    类名(也包括category 和 protocol 名)首字母大写, 使用大小写混写的方式来划分单词.
+
+对于 应用级别 的代码, 应当避免使用类名前缀. 每一个简单类都是用相同的前缀对破坏可读性, 没有在任何好处. 在设计多应用共享使用的代码时, 前缀是被接受和建议的.(例如, ``GTMSendMessage``).
+
+3.4. Category 名
+~~~~~~~~~~~~~~~~
+
+.. tip::
+    Category 名应该使用2-3个字符作为前缀来标识category 是作为工程的一部分还是开放使用的. category 名称还应该保护所扩展类的名称.
+
+例如, 如果你需要在``NSString``创建一个category 用于解析, 我们应该将这个category 放在一个名为``GTMNSString+Parsing.h``的文件中, 而它自身将被取名为``GTMStringParsingAdditions``(是的, 我们知道文件名和category 名不匹配, 但是这个文件中应该有许多和解析有关系的独立categories). 由于Objective-C 使用单一命名空间, 所以为了防止不必要的冲突, 在category 中的方法应该使用``gtm_myCategoryMethodOnAString:``作为前缀. 如果这份代码并不是为了分享或者运行在不同的地址空间, 那么方法的名字则不是那么重要了.
+
+3.5. Objective-C 方法名
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. tip::
+    方法名首字母应该小写, 使用大小写混写的方式来划分单词. 所有参数名首字母也应该小写.
+
+方法名应尽可能像是一个完整的句子, 这意味着你需要选择参数名来填充方法名.(例如. ``convertPoint:fromRect:`` 或者``replaceCharactersInRange:withString:``), 具体请查看`Apple's Guide to Naming Methods<http://developer.apple.com/documentation/Cocoa/Conceptual/CodingGuidelines/Articles/NamingMethods.html#//apple_ref/doc/uid/20001282-BCIGIJJF>`_.
+
+访问方法应被命名为他们要"getting"的变量名称, 但是不应包含"get" 前缀. 例如:
+
+
+    .. warning::
+        .. code-block:: c++
+        
+            - (id)getDelegate;  // AVOID
+
+    .. code-block:: c++
+    
+          - (id)delegate;    // GOOD
+
+此规则仅针对Objective-C 方法, 对于C++ 方法名和函数继续遵循在C++ 风格规范中的规定. 
+
+
+3.6. 变量名
+~~~~~~~~~~~~
+
+.. tip::
+    变量名首字母应小写, 使用大小写混写的方式来划分单词. 类成员变量应有下划线后缀. 比如``myLocalVariable``, ``myInstanceVariable_``. 当且仅当使用Objective-C 2.0 ``@property``的KVO/KVC绑定成员名称不得使用前导下划线.      Variables names start with a lowercase and use mixed case to delimit
+
+3.6.1. 普通变量名
+^^^^^^^^^^^^^^^^^
+
+.. tip::
+    不要为了语法属性使用匈牙利命名规则, 比如变量的类型(整数或指针). 尽可能的使用合理的描述性名称. 不要担心, 对于一个新的阅读者来说, 让你的代码被即时的理解更重要. 比如: 
+
+    .. warning::
+        .. code-block:: c++
+        
+            int w;     
+            int nerr;          
+            int nCompConns; 
+            tix = [[NSMutableArray alloc] init];
+            obj = [someObject object];
+            p = [network port];
+
+    .. code-block:: c++
+    
+          int numErrors;              
+          int numCompletedConnections; 
+          tickets = [[NSMutableArray alloc] init];
+          userInfo = [someObject object];
+          port = [network port];
+
+3.6.2. 实例变量
+^^^^^^^^^^^^^^^^
+.. tip::
+    实例变量应大小写混写并且以下划线为后缀. 但是当一个成员变量使用KVO/KVC 和Objective-C 2.0时 有一个例外(由于操作系统的发布约束). 在这种情况下, 前导下划线是被接受的, 这Apple的的键/值命名可接受习惯. 如果Objective-C 2.0可以使用, ``@property`` 和 ``@synthesize`` 提供了一个确定命名规则的解决方案.
+      
+3.6.3. 常量
+^^^^^^^^^^^
+.. tip::
+    常量(#defines, 枚举, 局部常量, 等)首字母应小写, 使用大小写混写的方式来划分单词. 例如``kInvalidHandle``, ``kWritePerm``.

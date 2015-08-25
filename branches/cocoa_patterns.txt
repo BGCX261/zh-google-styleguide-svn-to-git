@@ -1,0 +1,26 @@
+5. Cocoa模式
+------------
+
+5.1. 委托模式
+~~~~~~~~~~~~~~~~
+
+.. tip::
+    委托对象不应该被保存.
+
+实现委派模式的类应该是这样的: 
+
+    - 有一个名为``delegate_``的实例变量指向委托对象.
+	
+    - 访问方法应为被命名为``delegate``何``setDelegate:``.
+
+5.2. 模型(Model)/(视图)View/控制器(Controller)
+~~~~~~~~~~~~~~~~
+
+.. tip::
+    模型(Model)和视图(View)独立. 控制器(Controller)和模型(Model)、视图(View)独立. 使用``@protocol`` 作为回调API. 
+
+    - 模型(Model)和视图(View)独立: 不要尝试将表现面(presentation)插入到模型(Model)或数据源中. 保持数据源和表现抽象之间的接口. 不要让模型(Model)了解到与它相关视图(View)的信息. (一个好的总结方法就是, 询问自己你的数据源中的单一实例是否有可能有是否有可能存在包含多种状态的多个表现面(presentation)). 
+	
+    - 控制器(Controller)和模型(Model)、视图(View)独立: 不要把所有的 ``业务逻辑("business logic)`` 放入视图相关类中. 这会导致代码没有可用性. 让控制器(Controller)来管理这些代码, 但要确保控制器(Controller)类不会对表现面(presentation)存有过多假设.
+	
+    - 使用``@protocol`` 作为所有方法必须要实现的回调API. 对于不是必须实现的方法, 使用``catogory`` (或``informal protocol``).

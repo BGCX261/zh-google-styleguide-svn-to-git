@@ -1,0 +1,25 @@
+概括
+-----
+
+背景
+~~~~~~~~~~~~~~~~
+
+Objective-C 是一个动态的, 面向对象的C 扩展语言. 它的设计易于使用和阅读, 同时启用了复杂的面向对象设计. 它还是Mac OS X 和iPhone 应用程序的主要开发语言.
+
+Cocoa 是Mac OS X 上最主要的应用程序框架, 是为快速开发全功能的Mac OS X 应用程序而准备的Objective-C 类集合.
+
+Apple 已经写了一个非常好并且被广泛接受的Objective-C 代码规范. Google 也为C++ 写了一个类似的规范. 此份Objective-C 规范的目标是将Apple 的规范同Google的一般建议自然的结合在一起. 所以, 在阅读规范之前, 请先阅读以下内容: 
+
+    - `Apple 的Cocoa 代码规范 <http://developer.apple.com/documentation/Cocoa/Conceptual/CodingGuidelines/index.html>`_
+    - `Google 开源项目风格指南 - 中文版 <http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml>`_
+
+.. tip::
+    除非此文档特别指出, 所有在Google 的C++ 规范中禁止的, 在Objective-C 中同样是禁止的.
+
+此文档的目的是为所有Mac OS X 代码提供Objective-C 和 Objective-C++ 的代码规范和练习. 许多规范及其有效性已经被其他项目或者团队中被引进和证明.
+    
+由Google 开发的开源项目都遵循这些准则.
+
+Google 已经发布了遵从这些规范的开源代码作为`Google Toolbox for Mac project <http://code.google.com/p/google-toolbox-for-mac/>`_ 的一部分(在该文档中简称为GMT). 该项目主要包含一些意味着将来可能会被不同项目共享的代码
+
+注意:此规范并非Objective-C 教程. 我们假定读者非常熟悉该语言. 如果你是Objective-C 初学者或者需要Objective-C 参考, 请查看 `The Objective-C Programming Language <http://developer.apple.com/documentation/Cocoa/Conceptual/ObjectiveC/index.html>`_

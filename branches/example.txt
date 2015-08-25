@@ -1,0 +1,109 @@
+1. 例子
+------------
+
+人们都说例子胜过千言万语, 所以让我们先举几个例子, 以便你对风格、间隔、命名等有一个初步的了解吧. 
+
+1.1. 头文件示例
+~~~~~~~~~~~~~~~~
+
+演示如何为一个``@interface``声明添加正确的注释和使用间隔
+
+.. code-block:: c++
+    
+    //  GTMFoo.h
+    //  FooProject
+    //
+    //  Created by Greg Miller on 6/13/08.
+    //  Comments Translated by herb on 9/18/09.
+    //  Copyright 2008 Google, Inc. All rights reserved.
+    //
+    
+    #import <Foundation/Foundation.h>
+    
+    // 一个演示良好Objective-C 风格的示例类. 
+    // 应该为所有的interfaces, categories, 以及protocols (read: 头文件中最上层的声明)添加注释. 
+    // 注释必须与事实相符. 
+    //
+    // ( interface 和注释之间不应该有空行)
+    @interface GTMFoo : NSObject {
+     @private
+      NSString *foo_;
+      NSString *bar_;
+    }
+    
+    // 返回一个自动释放的 GMFoo 实例. 
+    // 关于参数的信息请查看 -initWithString
+    + (id)fooWithString:(NSString *)string;
+    
+    // 指定初始化函数. |string| 将被拷贝赋值给 |foo_|.
+    - (id)initWithString:(NSString *)string;
+    
+    // 得到或指定 |foo_| 的字符串值. 
+    - (NSString *)foo;
+    - (void)setFoo:(NSString *)newFoo;
+    
+    // 对 |blah| 进行一些处理
+    // 如果处理成功完成则返回 真, 如果失败返回 假
+    - (BOOL)doWorkWithString:(NSString *)blah;
+    
+    @end
+
+1.1. 源代码示例
+~~~~~~~~~~~~~~~
+
+演示如何为一个 ``interface`` 的 ``@implementation`` 正确的添加注释和使用间隔. 该实例同样包含了一些重要方法 (比如属性抽象、``初始化``、 ``析构``) 的参考实现.
+
+.. code-block:: c++
+    
+    //
+    //  GTMFoo.m
+    //  FooProject
+    //
+    //  Created by Greg Miller on 6/13/08.
+    //  Comments Translated by herb on 9/18/09.
+    //  Copyright 2008 Google, Inc. All rights reserved.
+    //
+    
+    #import "GTMFoo.h"
+    
+    
+    @implementation GTMFoo
+    
+    + (id)fooWithString:(NSString *)string {
+      return [[[self alloc] initWithString:string] autorelease];
+    }
+    
+    // 必须重载父类的指定初始化函数.
+    - (id)init {
+      return [self initWithString:nil];
+    }
+    
+    - (id)initWithString:(NSString *)string {
+      if ((self = [super init])) {
+        foo_ = [string copy];
+        bar_ = [[NSString alloc] initWithFormat:@"hi %d", 3];
+      }
+      return self;   
+    }
+    
+    - (void)dealloc {
+      [foo_ release];
+      [bar_ release];
+      [super dealloc];
+    }
+    
+    - (NSString *)foo {
+      return foo_;
+    }
+    
+    - (void)setFoo:(NSString *)newFoo {
+      [foo_ autorelease];
+      foo_ = [newFoo copy];   
+    }
+
+    - (BOOL)doWorkWithString:(NSString *)blah {
+      // ...
+      return NO;
+    }
+    
+    @end
